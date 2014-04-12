@@ -1,4 +1,7 @@
 <?php
+// This quickstart guide requires the PHP codekit, which can be found at:
+// https://github.com/attdevsupport/codekit-php
+
 // make sure this index.php file is in the same directory as the 'lib' folder.
 require_once __DIR__ . '/lib/OAuth/OAuthTokenService.php';
 require_once __DIR__ . '/lib/OAuth/OAuthCode.php';
@@ -8,14 +11,15 @@ require_once __DIR__ . '/lib/DC/DCService.php';
 use Att\Api\OAuth\OAuthTokenService;
 use Att\Api\OAuth\OAuthCode;
 use Att\Api\DC\DCService;
+use Att\Api\Srvc\ServiceException;
 
-// Use the app settings from developer.att.com for the following values.
-// Make sure DC is enabled the app key/secret.
+// Use the app account settings from developer.att.com for the following values.
+// Make sure DC is enabled for the App Key and App Secret.
 
-// Enter the value from 'App Key' field
+// Enter the value from the 'App Key' field
 $clientId = 'ENTER VALUE!';
 
-// Enter the value from 'Secret' field
+// Enter the value from the 'App Secret' field
 $clientSecret = 'ENTER VALUE!';
 
 // Get the OAuth code by opening a browser to the following URL:
@@ -27,24 +31,21 @@ $clientSecret = 'ENTER VALUE!';
 // (https://developer.att.com/developer/forward.jsp?passedItemId=13200290).
 $oauthCode = "ENTER VALUE!";
 
-// Create service for requesting an OAuth token
+// Create service for requesting an OAuth access token
 $osrvc = new OAuthTokenService('https://api.att.com', $clientId, $clientSecret);
 
 // Get OAuth token using the oauth code
 $token = $osrvc->getTokenUsingCode(new OAuthCode($oauthCode));
 
-// Create service for interacting with the DC api
+// Create service for interacting with the Device Capabilities API
 $dcSrvc = new DCService('https://api.att.com', $token);
 
-// Send a request for getting device information
-$response = $dcSrvc->getDeviceInformation();
+try {
+    // Send a request for getting device information
+    $response = $dcSrvc->getDeviceInformation();
+    echo 'typeAllocationCode: ' . $response->getTypeAllocationCode() . "\n"; 
+} catch(ServiceException $se) {
+    echo $se->getErrorResponse();
+}
+
 ?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>AT&amp;T DC Example</title>
-  </head>
-  <body>
-    typeAllocationCode: <?php echo $response->getTypeAllocationCode(); ?>
-  </body>
-</html>

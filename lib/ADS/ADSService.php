@@ -120,7 +120,6 @@ class ADSService extends APIService
         $endpoint = $this->getFqdn() . '/rest/1/ads';
 
         $req = new RestfulRequest($endpoint);
-
         $req
             ->setAuthorizationHeader($this->getToken())
             ->setHeader('User-agent', $userAgent)

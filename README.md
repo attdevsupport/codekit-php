@@ -11,8 +11,11 @@ The AT&T PHP Codekit allows you to interact with AT&T's APIs.
 
 ## Installation
 
-Copy the 'lib' folder to the the _DocumentRoot_ folder; for example, this
-folder might be: _/var/www/_
+Clone the latest version of the [Codekit](https://github.com/attdevsupport/codekit-php)
+to a folder.
+
+From the Codekit folder, copy the 'lib' folder to the _DocumentRoot_
+folder; for example, this folder might be: _/var/www/_
 
 ## Usage
 
