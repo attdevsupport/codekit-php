@@ -1,53 +1,58 @@
 <?php
-// This quickstart guide requires the PHP codekit, which can be found at:
+// This Quickstart Guide for the MMS API requires the PHP code kit, 
+// which can be found at:
 // https://github.com/attdevsupport/codekit-php
 
-// make sure this index.php file is in the same directory as the 'lib' folder.
+// Make sure the index.php file is in the same directory as the 'lib' folder.
 require_once __DIR__ . '/lib/OAuth/OAuthTokenService.php';
 require_once __DIR__ . '/lib/MMS/MMSService.php';
 
-// use any namespaced classes
+// Use any namespaced classes.
 use Att\Api\OAuth\OAuthTokenService;
 use Att\Api\MMS\MMSService;
 
 // Use the app account settings from developer.att.com for the following values.
-// Make sure MMS is enabled for the App key and App Secret.
+// Make sure that the API scope is set to MMS for the MMS API before 
+// retrieving the App Key and App Secret.
 
-// Enter the value from the 'App Key' field
+// Enter the value from the 'App Key' field obtained at developer.att.com 
+// in your app account.
 $clientId = 'ENTER VALUE!';
 
-// Enter the value from the 'App Secret' field
+// Enter the value from the 'App Secret' field obtained at developer.att.com 
+// in your app account.
 $clientSecret = 'ENTER VALUE!';
 
-// Create service for requesting an OAuth access token
+// Create the service for requesting an OAuth access token.
 $osrvc = new OAuthTokenService('https://api.att.com', $clientId, $clientSecret);
 
-// Get OAuth token using the MMS scope
+// Get the OAuth access token using the MMS scope.
 $token = $osrvc->getToken('MMS');
 
-// Create service for interacting with the MMS API
+// Create the service for interacting with the MMS API.
 $mmsSrvc = new MMSService('https://api.att.com', $token);
 
+/* This try/catch block tests the sendMMS method. */
 try {
-    /* This portion showcases the Send MMS API call. */
-    // Enter phone number that MMS will be sent to
-    // For example: $number = '5555555555';
+    // Specify the phone number where the message is sent. 
+    // For example: final String pn = "5555555555";
     $number = 'ENTER VALUE!';
-    // Enter file path(s) of attachment to send (or null if none)
-    // For example, $fnames = array('/tmp/image.gif'); or $fnames = null;
+    // Specify the file name and path for any attachment (or null if none).
+    // For example: $fnames = array('/tmp/image.gif');
+    // For example: $fnames = null;
     $fnames = array('ENTER VALUE');
-    // Send an MMS to the specified number with the specified attachment(s)
+    // Send the MMS message to the specified number with the specified attachment(s).
     $response = $mmsSrvc->sendMMS($number, $fnames);
     echo "msgId: " . $response->getMessageId() . "\n";
 } catch(ServiceException $se) {
     echo $se->getErrorResponse();
 }
 
+/* This try/catch block tests the getMMSStatus method. */
 try {
-    /* This portion showcases the Get MMS Status API call. */
-    // Enter message id for which to get status
+    // Enter the id of the message for which to get the status.
     $msgId = 'ENTER VALUE!';
-    // Send API request for getting message status
+    // Send the request for getting message status.
     $status = $mmsSrvc->getMMSStatus($msgId);
     echo "resourceUrl: " . $status->getResourceUrl() . "\n";
 } catch(ServiceException $se) {

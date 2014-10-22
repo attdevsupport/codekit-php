@@ -1,34 +1,29 @@
 <?php
 namespace Att\Api\Payment;
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 */
-
-/**
- * Payment Library
- * 
- * PHP version 5.4+
- * 
- * LICENSE: Licensed by AT&T under the 'Software Development Kit Tools 
- * Agreement.' 2013. 
- * TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTIONS:
- * http://developer.att.com/sdk_agreement/
+/*
+ * Copyright 2014 AT&T
  *
- * Copyright 2013 AT&T Intellectual Property. All rights reserved.
- * For more information contact developer.support@att.com
- * 
- * @category  API
- * @package   Payment
- * @author    pk9069
- * @copyright 2013 AT&T Intellectual Property
- * @license   http://developer.att.com/sdk_agreement AT&amp;T License
- * @link      http://developer.att.com
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 require_once __DIR__ . '../../Notary/NotaryService.php';
 require_once __DIR__ . '../../Srvc/APIService.php';
 
 use Att\Api\OAuth\OAuthToken;
+use Att\Api\Restful\HttpPut;
 use Att\Api\Restful\RestfulRequest;
+use Att\Api\Notary\Notary;
 use Att\Api\Srvc\APIService;
 use Att\Api\Srvc\Service;
 
@@ -38,7 +33,7 @@ use Att\Api\Srvc\Service;
  * @category API
  * @package  Payment
  * @author   pk9069
- * @license  http://developer.att.com/sdk_agreement AT&amp;T License
+ * @license  http://www.apache.org/licenses/LICENSE-2.0
  * @version  Release: @package_version@ 
  * @link     https://developer.att.com/docs/apis/rest/3/Payment
  */
@@ -107,21 +102,22 @@ class PaymentService extends APIService
         $rReasonTxt, $rReasonCode, $transOptStatus, $url
     ) {
 
-        $req = new RESTFulRequest($url);
-        $req->setHttpMethod(RESTFulRequest::HTTP_METHOD_PUT);
-        $req->setHeader('Accept', 'application/json');
-        $req->setHeader('Content-Type', 'application/json');
-        $req->addAuthorizationHeader($this->token);
+        $req = new RestfulRequest($url);
 
         $bodyArr = array(
             'TransactionOperationStatus' => $transOptStatus,
             'RefundReasonCode' => $rReasonCode,
             'RefundReasonText' => $rReasonTxt,
         );
+        $httpPut = new HttpPut(json_encode($bodyArr));
 
-        $req->setPutData(json_encode($bodyArr));
-        $result = $req->sendRequest();
-        return $this->parseResult($result);
+        $req->setHeader('Accept', 'application/json')
+            ->setAuthorizationHeader($this->getToken())
+            ->setHeader('Content-Type', 'application/json');
+
+        $result = $req->sendHttpPut($httpPut);
+
+        return Service::parseJson($result);
     }
 
     /**
@@ -158,7 +154,7 @@ class PaymentService extends APIService
         $urlPath = '/rest/3/Commerce/Payment/Transactions/' . $type . '/' 
             . $value;
 
-        $url = $this->getFqnd() . $urlPath;
+        $url = $this->getFqdn() . $urlPath;
 
         return $this->_getInfo($url);
     }
@@ -185,7 +181,7 @@ class PaymentService extends APIService
         $urlPath = '/rest/3/Commerce/Payment/Subscriptions/' . $type . '/' 
             . $value;
 
-        $url = $this->FQDN . $urlPath;
+        $url = $this->getFqdn() . $urlPath;
 
         return $this->_getInfo($url);
     }
@@ -204,7 +200,7 @@ class PaymentService extends APIService
         $urlPath =  '/rest/3/Commerce/Payment/Subscriptions/' . $merchantSId 
             . '/Detail/' . $consumerId;
 
-        $url = $this->FQDN . $urlPath;
+        $url = $this->getFqdn() . $urlPath;
 
         return $this->_getInfo($url);
     }
@@ -222,7 +218,7 @@ class PaymentService extends APIService
     public function cancelSubscription($subId, $reasonTxt, $reasonCode = 1)
     {
         $urlPath = '/rest/3/Commerce/Payment/Transactions/' . $subId;
-        $url = $this->FQDN . $urlPath; 
+        $url = $this->getFqdn() . $urlPath; 
             
         $type = 'SubscriptionCancelled';
         return $this->_sendTransOptStatus($reasonTxt, $reasonCode, $type, $url);
@@ -241,7 +237,7 @@ class PaymentService extends APIService
     public function refundSubscription($subId, $reasonTxt, $reasonCode = 1)
     {
         $urlPath = '/rest/3/Commerce/Payment/Transactions/' . $subId;
-        $url = $this->FQDN . $urlPath;
+        $url = $this->getFqdn() . $urlPath;
 
         $type = 'Refunded';
         return $this->_sendTransOptStatus($reasonTxt, $reasonCode, $type, $url);
@@ -260,7 +256,7 @@ class PaymentService extends APIService
     public function refundTransaction($transId, $reasonTxt, $reasonCode = 1)
     {
         $urlPath = '/rest/3/Commerce/Payment/Transactions/' . $transId;
-        $url = $this->FQDN . $urlPath;
+        $url = $this->getFqdn() . $urlPath;
 
         $type = 'Refunded';
         return $this->_sendTransOptStatus($reasonTxt, $reasonCode, $type, $url);
@@ -298,7 +294,7 @@ class PaymentService extends APIService
     public function deleteNotification($notificationId)
     {
         $urlPath = '/rest/3/Commerce/Payment/Notifications/' . $notificationId;
-        $url = $this->FQDN . $urlPath;
+        $url = $this->getFqdn() . $urlPath;
 
         $req = new RESTFulRequest($url);
         $req->setHttpMethod(RESTFulRequest::HTTP_METHOD_PUT);
@@ -341,4 +337,6 @@ class PaymentService extends APIService
         header('Location: ' . $url);
     }
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 ?>

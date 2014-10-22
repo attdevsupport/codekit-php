@@ -1,73 +1,78 @@
 <?php
-// This quickstart guide requires the PHP codekit, which can be found at:
+// This Quickstart Guide for the Speech API requires the PHP code kit, 
+// which can be found at:
 // https://github.com/attdevsupport/codekit-php
 
-// make sure this index.php file is in the same directory as the 'lib' folder.
+// Make sure that the index.php file is in the same directory as the 'lib' folder.
 require_once __DIR__ . '/lib/OAuth/OAuthTokenService.php';
 require_once __DIR__ . '/lib/Speech/SpeechService.php';
 
-// use any namespaced classes
+// Use any namespaced classes.
 use Att\Api\OAuth\OAuthTokenService;
 use Att\Api\Speech\SpeechService;
 
 // Use the app account settings from developer.att.com for the following values.
-// Make sure Speech is enabled for the App Key and App Secret.
+// Make sure that the API scope is set to SPEECH for the Speech API before 
+// retrieving the App Key and App Secret.
 
-// Enter the value from the 'App Key' field
+// Enter the value from the 'App Key' field obtained at developer.att.com 
+// in your app account.
 $clientId = 'ENTER VALUE!';
 
-// Enter the value from the 'App Secret' field
+// Enter the value from the 'App Secret' field obtained at developer.att.com 
+// in your app account.
 $clientSecret = 'ENTER VALUE!';
 
-// Create service for requesting an OAuth access token
+// Create the service for requesting an OAuth access token.
 $osrvc = new OAuthTokenService('https://api.att.com', $clientId, $clientSecret);
 
-// Get OAuth access token
+// Get the OAuth access token.
 $token = $osrvc->getToken('SPEECH');
 
-// Create service for interacting with the Speech api
+// Create the service for interacting with the Speech API.
 $speechSrvc = new SpeechService('https://api.att.com', $token);
 
 // The Speech API requires the audio files to be certain formats. In order to
-// convert speech files to the proper format, the ffmpeg program may be used,
-// and can be downloaded from https://ffmpeg.org/
+// convert speech files to the proper format, the ffmpeg program may be used.
+// The ffmpeg program can be downloaded from https://ffmpeg.org/
 
-// The following lines of code showcase the possible method calls for 
-// the SpeechService class; to test only a particular method call, comment out
-// any other method calls.
+// The following try/catch blocks can be used to test the methods of the 
+// Speech API. To test a specific method, comment out the other try/catch blocks.
 
+/* This try/catch block tests the speechToText method. */
 try {
-    /* This portion showcases the Speech to Text API Call. */
-    // Enter path of file to translate; e.g. $fname = '/tmp/file.wav';
+    // Enter the path of the file to translate. For example: $fname = '/tmp/file.wav';
     $fname = 'ENTER VALUE!';
     $speechContext = 'Generic';
-    // Send a request for converting the speech file to text
+    // Send the request to convert the speech file to text.
     $response = $speechSrvc->speechToText($fname, $speechContext);
     echo 'responseId: ' . $response->getResponseId() . "\n";
 } catch(ServiceException $se) {
     echo $se->getErrorResponse();
 }
 
+/* This try/catch block tests the textToSpeech method. */
 try {
-    /* This portion showcases the Text To Speech API Call. */
-    // Enter value for content type
+    
+    // Specify the content type.
     $ctype = 'ENTER VALUE!';
-    // Enter text to convert to speech
+    // Specify text to convert to speech.
     $txt = 'ENTER VALUE!';
-    // Send a request for converting the specified text to audio
+    // Send the request to convert the specified text to audio.
     $response = $speechSrvc->textToSpeech($ctype, $txt);
     echo 'audio length: ' . strlen($response) . "\n";
 } catch(ServiceException $se) {
     echo $se->getErrorResponse();
 }
 
+/* This try/catch block tests the speechToTextCustom method. */
 try {
-    /* This portion showcases the Speech to Text Custom API Call. */
-    // Enter path of file to translate; e.g. $fname = '/tmp/file.wav';
+    
+    // Enter the path of the file to translate. For example: $fname = '/tmp/file.wav';
     $fname = 'ENTER VALUE!';
     $speechContext = 'Generic';
-    // Send a request for converting the speech file to text
-    $response = $speechSrvc->speechToTextCustom($fname, $speechContext);
+    // Send the request to convert the speech file to text.
+    $response = $speechSrvc->speechToTextCustom($speechContext, $fname);
     echo 'responseId: ' . $response->getResponseId() . "\n";
 } catch(ServiceException $se) {
     echo $se->getErrorResponse();
