@@ -1,5 +1,5 @@
 <?php
-namespace Att\Api\Restful;
+namespace Att\Api\Webhooks;
 
 /*
  * Copyright 2014 AT&T
@@ -17,20 +17,34 @@ namespace Att\Api\Restful;
  * limitations under the License.
  */
 
-final class HttpPut
+/**
+ * Contains response values for the subscription object.
+ *
+ * @category API
+ * @package  Webhooks
+ * @author   pk9069
+ * @license  http://www.apache.org/licenses/LICENSE-2.0
+ * @version  Release: @package_version@
+ */
+final class SubscriptionResponse
 {
-    private $_putData;
+    private $_subscriptionId;
+    private $_expiresIn;
 
-    public function __construct($putData)
-    {
-        $this->_putData = $putData;
+    public function __construct($subscriptionId, $expiresIn) {
+        $this->_subscriptionId = $subscriptionId;
+        $this->_expiresIn = $expiresIn;
     }
 
-    public function getPutData()
+    public function getSubscriptionId()
     {
-        return $this->_putData;
+        return $this->_subscriptionId;
     }
 
+    public function getExpiresIn()
+    {
+        return $this->_expiresIn;
+    }
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
