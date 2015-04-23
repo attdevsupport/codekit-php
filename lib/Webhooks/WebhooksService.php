@@ -79,15 +79,18 @@ class WebhooksService extends APIService
             ->setAuthorizationHeader($this->getToken())
             ->setHeader('Accept', 'application/json')
             ->setHeader('Content-Type', 'application/json');
-        $channelVals = array(
-            'serviceName' => $channel->getServiceName(),
-            'notificationContentType' => $channel->getNotificationContentType(),
-            'notificationVersion' => $channel->getNotificationVersion()
-        );
-        $jsobj = array('channel' => $channelVals);
-        $jvals = json_encode($jsobj);
+        // PHP strips out .0 from 1.0 during json_encode; therefore, the string
+        // has to be manually constructed.
+        // Issue has been fixed in future PHP versions by specifying the
+        // JSON_PRESERVE_ZERO_FRACTION flag.
+        // See: https://bugs.php.net/bug.php?id=50224
+        $bodyString = '{"channel":{"serviceName":';
+        $bodyString .= ('"'. $channel->getServiceName() . '"');
+        $bodyString .= ',"notificationContentType":';
+        $bodyString .= json_encode($channel->getNotificationContentType());
+        $bodyString .= ',"notificationVersion":1.0}}';
         $httpPost = new HttpPost();
-        $httpPost->setBody($jvals);
+        $httpPost->setBody($bodyString);
         $result = $req->sendHttpPost($httpPost);
         $location = $result->getHeader('location');
         $systemTransId = $result->getHeader('x-systemTransactionId');
@@ -278,7 +281,13 @@ class WebhooksService extends APIService
         $arrSubscription = $arr['subscription'];
         $arrSubscriptionId = $arrSubscription['subscriptionId'];
         $arrExpiresIn = $arrSubscription['expiresIn'];
-        $arrEvents = $arrSubscription['events'];
+        /* TODO: remove work-around for events/eventFilters check */
+        $arrEvents = null;
+        if (isset($arrSubscription['events'])) {
+            $arrEvents = $arrSubscription['events'];
+        } else {
+            $arrEvents = $arrSubscription['eventFilters'];
+        }
         $arrCallbackData = $arrSubscription['callbackData'];
 
         return new GetSubscriptionResponse(
