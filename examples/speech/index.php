@@ -27,7 +27,7 @@ $clientSecret = 'ENTER VALUE!';
 $osrvc = new OAuthTokenService('https://api.att.com', $clientId, $clientSecret);
 
 // Get the OAuth access token.
-$token = $osrvc->getToken('SPEECH');
+$token = $osrvc->getToken('SPEECH,STTC,TTS');
 
 // Create the service for interacting with the Speech API.
 $speechSrvc = new SpeechService('https://api.att.com', $token);
@@ -67,13 +67,22 @@ try {
 
 /* This try/catch block tests the speechToTextCustom method. */
 try {
-    
-    // Enter the path of the file to translate. For example: $fname = '/tmp/file.wav';
+    // Enter the path of the file to translate.
+    // For example: $fname = '/tmp/file.wav';
     $fname = 'ENTER VALUE!';
-    $speechContext = 'Generic';
+    // Enter the path of the grammar file.
+    // For example: $gfname = '/tmp/x-grammar.txt'
+    $gfname = 'ENTER VALUE!';
+    // Enter the path of the dictionary file.
+    // For example: $dfname = '/tmp/x-dictionary.txt'
+    $dfname = 'ENTER VALUE!';
+    $speechContext = 'GenericHints';
     // Send the request to convert the speech file to text.
-    $response = $speechSrvc->speechToTextCustom($speechContext, $fname);
-    echo 'responseId: ' . $response->getResponseId() . "\n";
+    $response = $speechSrvc->speechToTextCustom(
+        $speechContext, $fname, $gfname, $dfname
+    );
+    $recognition = $response['Recognition'];
+    echo 'responseId: ' . $recognition['ResponseId'] . "\n";
 } catch(ServiceException $se) {
     echo $se->getErrorResponse();
 }
