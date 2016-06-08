@@ -7,7 +7,7 @@ class OAuthTokenServiceTest extends PHPUnit_Framework_TestCase
 {
     public function testRequest() 
     {
-        require __DIR__ . '/cfgs/ads_config.php';
+        require __DIR__ . '/cfgs/sms_config.php';
 
         if (isset($proxyHost) && isset($proxyPort))
             RestfulEnvironment::setProxy($proxyHost, $proxyPort);
@@ -15,7 +15,7 @@ class OAuthTokenServiceTest extends PHPUnit_Framework_TestCase
             RestfulEnvironment::setAcceptAllCerts($allowAllCerts);
 
         $tokenSrvc = new OAuthTokenService($FQDN, $api_key, $secret_key);
-        $token = $tokenSrvc->getToken('ADS');
+        $token = $tokenSrvc->getToken('SMS');
 
         $this->assertTrue($token->getAccessToken() != '');
 
